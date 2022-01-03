@@ -1,0 +1,365 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Hands_on_Data_science.ipynb",
+      "provenance": [],
+      "collapsed_sections": [],
+      "authorship_tag": "ABX9TyN6GDwGRaJAINDpXFKWo5bh",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/stac-bot/Data/blob/master/disney_data_final.json\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Task#!: get the info Box(store in python Dictionary)"
+      ],
+      "metadata": {
+        "id": "_nO6bzzeJ12l"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#importatn Necessary libraries\n",
+        "from bs4 import BeautifulSoup as bs\n",
+        "import requests"
+      ],
+      "metadata": {
+        "id": "9hNV36koLZVZ"
+      },
+      "execution_count": 2,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Load the Webpage"
+      ],
+      "metadata": {
+        "id": "cqNVwOpKLwhZ"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "\n",
+        "r = requests.get('https://en.wikipedia.org/wiki/Toy_Story_3')\n",
+        "#convert into beautifulsoup object\n",
+        "soup = bs(r.content)\n",
+        "\n",
+        "#print out html\n",
+        "contents = soup.prettify()\n",
+        "print(contents)\n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "vpDmK1DPLp1D"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "info_box = soup.find(class_ = \"infobox vevent\")\n",
+        "info_rows = info_box.find_all(\"tr\")\n",
+        "\n",
+        "\n",
+        "for row in info_rows:\n",
+        "  print(row.prettify())"
+      ],
+      "metadata": {
+        "id": "Ur1FNfqRNbti"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        ""
+      ],
+      "metadata": {
+        "id": "P-Y93nGJPEEU"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def get_content_value(row_data):\n",
+        "  if row_data.find(\"li\"):\n",
+        "    return [li.get_text(\" \", strip = True).replace(\"\\xa0\",\" \") for li in row_data.find_all(\"li\")]\n",
+        "  else:\n",
+        "    return row_data.get_text(\" \", strip = True).replace(\"\\xa0\",\" \") \n",
+        "\n",
+        "movie_info = {}\n",
+        "\n",
+        "for index, row in enumerate(info_rows):\n",
+        "  if index == 0:\n",
+        "    movie_info['title']= row.find(\"th\").get_text(\" \", strip = True)\n",
+        "  elif index ==1:\n",
+        "    continue\n",
+        "  else:\n",
+        "    content_key = row.find(\"th\").get_text(\" \", strip = True)\n",
+        "    content_value = get_content_value(row.find(\"td\"))\n",
+        "    movie_info[content_key] = content_value\n",
+        "\n",
+        "\n",
+        "\n",
+        "#movie_info"
+      ],
+      "metadata": {
+        "id": "Dc_GdyGmOkCW"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Task#2: Get the info box for all movies\n",
+        "\n",
+        "\n",
+        "*\n",
+        "\n",
+        "{sitename robots.txt}(wary, go to site and check with what data you can mess with, rules and regulation)"
+      ],
+      "metadata": {
+        "id": "_CatTpvAWN3t"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "r = requests.get('https://en.wikipedia.org/wiki/List_of_Walt_Disney_Pictures_films')\n",
+        "#convert into beautifulsoup object\n",
+        "soup = bs(r.content)\n",
+        "\n",
+        "#print out html\n",
+        "contents = soup.prettify()\n",
+        "print(contents)\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "e3eeYo_RS-sw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "movies = soup.select(\".wikitable.sortable i\")\n",
+        "movies[2:12]"
+      ],
+      "metadata": {
+        "id": "OrpbrKzEXkhD"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "movies[2]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "UfRS0z_DX_J2",
+        "outputId": "be452aa0-7508-49ed-958e-10cfc3b69eda"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<i><a href=\"/wiki/Pinocchio_(1940_film)\" title=\"Pinocchio (1940 film)\">Pinocchio</a></i>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 33
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "\n",
+        "def get_content_value(row_data):\n",
+        "  if row_data.find(\"li\"):\n",
+        "    return [li.get_text(\" \", strip = True).replace(\"\\xa0\",\" \") for li in row_data.find_all(\"li\")]\n",
+        "  else:\n",
+        "    return row_data.get_text(\" \", strip = True).replace(\"\\xa0\",\" \") \n",
+        "\n",
+        "def get_info_box(url):\n",
+        "  r = requests.get(url)\n",
+        "  #convert into beautifulsoup object\n",
+        "  soup = bs(r.content)\n",
+        "  \n",
+        "  info_box = soup.find(class_ = \"infobox vevent\")\n",
+        "  info_rows = info_box.find_all(\"tr\") \n",
+        "\n",
+        "  \n",
+        "  movie_info = {}\n",
+        "  for index, row in enumerate(info_rows):\n",
+        "    if index == 0:\n",
+        "      movie_info['title']= row.find(\"th\").get_text(\" \", strip = True)\n",
+        "    elif index ==1:\n",
+        "      continue\n",
+        "    else:\n",
+        "      content_key = row.find(\"th\").get_text(\" \", strip = True)\n",
+        "      content_value = get_content_value(row.find(\"td\"))\n",
+        "      movie_info[content_key] = content_value\n",
+        "\n",
+        "  return movie_info\n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "IhYMtgY5aSMP"
+      },
+      "execution_count": 8,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#for all movies on the page \n",
+        "r = requests.get('https://en.wikipedia.org/wiki/List_of_Walt_Disney_Pictures_films')\n",
+        "#convert into beautifulsoup object\n",
+        "movies = soup.select(\".wikitable.sortable i a\")\n",
+        "\n",
+        "soup = bs(r.content)\n",
+        "#print(len(movies))\n",
+        "\n",
+        "base_path = \"https://en.wikipedia.org/\"\n",
+        "\n",
+        "movie_info_list = []\n",
+        "for index, movie in enumerate(movies):\n",
+        "  if index == 10:\n",
+        "    break\n",
+        "  try:\n",
+        "    relative_path = movie[\"href\"]\n",
+        "    title = movie[\"title\"]\n",
+        "    full_path = base_path + relative_path\n",
+        "\n",
+        "\n",
+        "    movie_info_list.append(get_info_box(full_path))\n",
+        "\n",
+        "  except Exception as e:\n",
+        "    print(movie.get_text())\n",
+        "    print(e)"
+      ],
+      "metadata": {
+        "id": "cUp76GU5bzDS"
+      },
+      "execution_count": 9,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(movie_info_list[0])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DlMVtfKzd25s",
+        "outputId": "a78566b1-b180-4726-a3ea-d1a4fa0a6ef1"
+      },
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "8"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 10
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**save/load Movies data**"
+      ],
+      "metadata": {
+        "id": "Ds9up1hPD94-"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "\n",
+        "def save_data(title, data):\n",
+        "  with open(title, 'w',encoding='utf-8') as f:\n",
+        "    json.dump(data, f, ensure_ascii = False, indent = 2)"
+      ],
+      "metadata": {
+        "id": "z-9SFnSlf0RL"
+      },
+      "execution_count": 12,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "\n",
+        "def load_data(title):\n",
+        "  with open(title, encoding='utf-8') as f:\n",
+        "    return json.load(f)"
+      ],
+      "metadata": {
+        "id": "OLTTN_eDFWBF"
+      },
+      "execution_count": 13,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        ""
+      ],
+      "metadata": {
+        "id": "x3uP25CRHI2D"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
